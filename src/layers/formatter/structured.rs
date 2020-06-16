@@ -12,7 +12,9 @@ use tracing_subscriber::Layer;
 use std::{io::{self, Write}, str::FromStr, fmt, collections::{HashMap, BTreeMap}};
 use crate::layers::prelude::JsonStorage;
 use crate::layers::formatter::errors::*;
+use std::sync::Arc;
 
+#[derive(Clone, Debug)]
 pub enum ReturnType {
     RetStr(String),
     RetU64(u64),
@@ -20,7 +22,7 @@ pub enum ReturnType {
     RetBool4(bool),
 }
 
-pub type FunStub = Box<dyn FnMut() -> ReturnType>;
+pub type FunStub = Arc<dyn Fn() -> Box<dyn Any + Send + Sync> + 'static>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Datatype {
@@ -129,7 +131,6 @@ impl fmt::Display for SpanState {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Structured<W>
 where
     W: MakeWriter + 'static
@@ -176,9 +177,9 @@ where
 
     pub fn functions(&mut self, funs: Vec<(String, FunStub)>) {
         funs
-            .iter()
+            .into_iter()
             .for_each(|(k, v)| {
-                self.fun_registry.insert(k.to_owned(), v.to_owned());
+                self.fun_registry.insert(k.to_owned(), v);
             });
     }
 

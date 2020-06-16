@@ -4,6 +4,7 @@ use tracing::info;
 use tracing_subscriber::Registry;
 use tracing_subscriber::layer::SubscriberExt;
 
+use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 #[instrument]
@@ -65,7 +66,7 @@ fn main() {
     let event_counter: FunStub = || {
         // let x = counter.fetch_add(1_u64, Ordering::SeqCst);
         let x = 1234_u64;
-        Box::new(x)
+        x
     };
     // counter.fetch_add(1, Ordering::Relaxed)
 
@@ -73,7 +74,7 @@ fn main() {
     let mut formatting_layer = Structured::new(config, std::io::stdout).unwrap();
     formatting_layer.functions(
         vec![
-            ("entry_id".to_owned(), event_counter)
+            ("entry_id".to_owned(), Arc::new(event_counter))
         ]
     );
 
