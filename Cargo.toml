@@ -3,6 +3,7 @@ name = "tracing-json"
 version = "0.1.0"
 authors = ["Mahmut Bulut <vertexclique@gmail.com>"]
 edition = "2018"
+description = "Tracing Structured Json Logging Adapter"
 keywords = ["tracing", "logging", "metrics", "json", "subscriber"]
 categories = ["development-tools", "development-tools::debugging", "development-tools::profiling"]
 homepage = "https://github.com/vertexclique/tracing-json"

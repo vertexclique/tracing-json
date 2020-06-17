@@ -5,12 +5,7 @@ use serde::Serializer;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt,
-    io::{self, Write},
-    str::FromStr,
-};
+use std::{fmt, io::Write};
 use tracing::{span::Attributes, Event, Id, Level, Subscriber};
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::layer::Context;
@@ -239,7 +234,7 @@ where
         self.structured_fields(&mut map_serializer, &message, event.metadata().level())?;
 
         // Add all the other fields associated with the event, expect the message we already used.
-        event_visitor
+        let _ = event_visitor
             .values()
             .iter()
             .filter(|(&key, _)| key != "message")
@@ -251,7 +246,7 @@ where
         if let Some(span) = &current_span {
             let extensions = span.extensions();
             if let Some(visitor) = extensions.get::<JsonStorage>() {
-                visitor
+                let _ = visitor
                     .values()
                     .iter()
                     .try_for_each(|(key, value)| -> Result<()> {
